@@ -34,12 +34,14 @@ fn split_at_mid<T>(slice: &mut [T], mid: usize) -> Option<(&mut [T], &mut T, &mu
 struct BlocksWrapper {
     items: Vec<BlockWrapper>,
     cursor: usize,
+    start_from_left: bool,
 }
 impl From<s_text_input_f::Blocks> for BlocksWrapper {
     fn from(value: s_text_input_f::Blocks) -> Self {
         Self {
             items: value.into_iter().map(|x| x.into()).collect(),
             cursor: 0,
+            start_from_left: true,
         }
     }
 }
@@ -57,7 +59,7 @@ impl BlocksWrapper {
         let result_kind = loop {
             let (head, current_block, tail) = split_at_mid(&mut self.items, self.cursor).unwrap();
             let get_input_result = current_block
-                .get_input(&mut |current_placeholder_lines| {
+                .get_input(self.start_from_left, &mut |current_placeholder_lines| {
                     let head_lines = head.iter().flat_map(|x| x.as_lines());
                     let tail_lines = tail.iter().flat_map(|x| x.as_lines());
                     let text: Text = head_lines
@@ -76,8 +78,6 @@ impl BlocksWrapper {
                         }
                     }
                     ResultKind::Canceled => break ResultKind::Canceled,
-                    // FIXME: this cases can "refresh"/"restart" position in Block, so it's feel
-                    // like wrapping effect
                     ResultKind::NextItem => {
                         self.select_next_block().unwrap();
                     }
@@ -111,9 +111,11 @@ impl BlocksWrapper {
         } else {
             self.cursor += 1;
             if self.cursor < self.items.len() {
+                self.start_from_left = true;
                 Some(true)
             } else {
                 self.cursor -= 1;
+                self.start_from_left = false;
                 Some(false)
             }
         }
@@ -126,9 +128,11 @@ impl BlocksWrapper {
         if self.items.is_empty() {
             None
         } else if let Some(x) = self.cursor.checked_sub(1) {
+            self.start_from_left = false;
             self.cursor = x;
             Some(true)
         } else {
+            self.start_from_left = true;
             Some(false)
         }
     }
@@ -169,13 +173,16 @@ mod block_wraper {
         }
         pub fn get_input(
             &mut self,
+            start_from_left: bool,
             render: &mut impl FnMut(Vec<Line>) -> std::io::Result<()>,
         ) -> Option<std::io::Result<ResultKind>> {
             match self {
                 BlockWrapper::Order => todo!(),
                 BlockWrapper::AnyOf => todo!(),
                 BlockWrapper::OneOf => todo!(),
-                BlockWrapper::Paragraph(p) => p.get_input(&mut |line| render(vec![line])),
+                BlockWrapper::Paragraph(p) => {
+                    p.get_input(start_from_left, &mut |line| render(vec![line]))
+                }
             }
         }
         pub fn as_lines(&self) -> Vec<Line> {
@@ -215,11 +222,16 @@ mod block_wraper {
             }
             pub fn get_input(
                 &mut self,
+                start_from_left: bool,
                 render: &mut impl FnMut(Line) -> std::io::Result<()>,
             ) -> Option<std::io::Result<ResultKind>> {
                 // TODO: add support for start from first and from last
 
-                self.select_first_placeholder()?;
+                if start_from_left {
+                    self.select_first_placeholder()?;
+                } else {
+                    self.select_last_placeholder()?;
+                }
 
                 let result_kind = loop {
                     let (head, current_placeholder, tail) =
@@ -270,6 +282,18 @@ mod block_wraper {
                 if !self.get_current()?.is_placeholder() {
                     let its_wrongly_last = !self.select_next_placeholder()?;
                     if its_wrongly_last {
+                        return None;
+                    }
+                }
+                Some(())
+            }
+            /// # Errors
+            /// if there is no placeholders
+            fn select_last_placeholder(&mut self) -> Option<()> {
+                self.cursor = self.items.len() - 1;
+                if !self.get_current()?.is_placeholder() {
+                    let its_wrongly_first = !self.select_prev_placeholder()?;
+                    if its_wrongly_first {
                         return None;
                     }
                 }
@@ -331,10 +355,7 @@ mod block_wraper {
         }
 
         pub mod paragraph_item_wrapper {
-            use crate::{
-                blank_field::{self, BlankField},
-                ResultKind,
-            };
+            use crate::{blank_field::BlankField, ResultKind};
             use ratatui::{style::Stylize, text::Span};
 
             #[derive(Debug)]
