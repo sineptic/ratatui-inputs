@@ -50,6 +50,7 @@ impl BlankField {
         self.cursor += 1;
         self.cursor = self.cursor.clamp(0, self.text.len());
     }
+    #[allow(clippy::too_many_lines)]
     fn get_event() -> std::io::Result<Event> {
         Ok({
             loop {
@@ -112,8 +113,8 @@ impl BlankField {
             if let Some(x) = self.handle_event(Self::get_event()?) {
                 match x {
                     Event::Finish => return Ok(ResultKind::Ok),
-                    Event::NextField => return Ok(ResultKind::NextItem),
-                    Event::PrevField => return Ok(ResultKind::PrevItem),
+                    Event::NextField => return Ok(ResultKind::NextBlock),
+                    Event::PrevField => return Ok(ResultKind::PrevBlock),
                     Event::Cancel => return Ok(ResultKind::Canceled),
                     _ => unreachable!(),
                 }

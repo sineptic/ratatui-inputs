@@ -22,13 +22,12 @@ impl ParagraphWrapper {
             .filter_map(|x| x.finalize().ok())
             .collect()
     }
+    #[allow(clippy::too_many_lines)]
     pub fn get_input(
         &mut self,
         start_from_left: bool,
         render: &mut impl FnMut(Line) -> std::io::Result<()>,
     ) -> Option<std::io::Result<ResultKind>> {
-        // TODO: add support for start from first and from last
-
         if start_from_left {
             self.select_first_placeholder()?;
         } else {
@@ -38,17 +37,7 @@ impl ParagraphWrapper {
         let result_kind = loop {
             let (head, current_placeholder, tail) =
                 split_at_mid(&mut self.items, self.cursor).unwrap();
-            let get_input_result = current_placeholder
-                .get_input(&mut |current_placeholder_spans| {
-                    let head_spans = head.iter().flat_map(|x| x.as_spans());
-                    let tail_spans = tail.iter().flat_map(|x| x.as_spans());
-                    let line: Line = head_spans
-                        .chain(current_placeholder_spans)
-                        .chain(tail_spans)
-                        .collect();
-                    render(line)
-                })
-                .unwrap();
+            let get_input_result = get_input(current_placeholder, head, tail, render).unwrap();
             if let Ok(result_kind) = get_input_result {
                 match result_kind {
                     ResultKind::Ok => {
@@ -58,16 +47,16 @@ impl ParagraphWrapper {
                         }
                     }
                     ResultKind::Canceled => break ResultKind::Canceled,
-                    ResultKind::NextItem => {
+                    ResultKind::NextBlock => {
                         let next_elem_exist = self.select_next_placeholder().unwrap();
                         if !next_elem_exist {
-                            break ResultKind::NextItem;
+                            break ResultKind::NextBlock;
                         }
                     }
-                    ResultKind::PrevItem => {
+                    ResultKind::PrevBlock => {
                         let prev_item_exist = self.select_prev_placeholder().unwrap();
                         if !prev_item_exist {
-                            break ResultKind::PrevItem;
+                            break ResultKind::PrevBlock;
                         }
                     }
                 };
@@ -155,6 +144,23 @@ impl ParagraphWrapper {
     }
 }
 
+fn get_input(
+    current_placeholder: &mut ParagraphItemWrapper,
+    head: &mut [ParagraphItemWrapper],
+    tail: &mut [ParagraphItemWrapper],
+    render: &mut impl FnMut(Line) -> Result<(), std::io::Error>,
+) -> Option<Result<ResultKind, std::io::Error>> {
+    current_placeholder.get_input(&mut |current_placeholder_spans| {
+        let head_spans = head.iter().flat_map(|x| x.as_spans());
+        let tail_spans = tail.iter().flat_map(|x| x.as_spans());
+        let line: Line = head_spans
+            .chain(current_placeholder_spans)
+            .chain(tail_spans)
+            .collect();
+        render(line)
+    })
+}
+
 pub mod paragraph_item_wrapper {
     use crate::{blank_field::BlankField, ResultKind};
     use ratatui::{style::Stylize, text::Span};
@@ -188,8 +194,8 @@ pub mod paragraph_item_wrapper {
                     match a.get_input(&mut |c| render_active_blank_field(c, render))? {
                         ResultKind::Ok => ResultKind::Ok,
                         ResultKind::Canceled => ResultKind::Canceled,
-                        ResultKind::NextItem => ResultKind::NextItem,
-                        ResultKind::PrevItem => ResultKind::PrevItem,
+                        ResultKind::NextBlock => ResultKind::NextBlock,
+                        ResultKind::PrevBlock => ResultKind::PrevBlock,
                     },
                 )
             })())
@@ -199,7 +205,7 @@ pub mod paragraph_item_wrapper {
                 ParagraphItemWrapper::Text(s) => vec![s.into()],
                 ParagraphItemWrapper::Placeholder(blank_field) => {
                     if blank_field.is_empty() {
-                        vec![Span::raw("<todo>").dark_gray().italic()]
+                        vec![Span::raw("<empty>").dark_gray().italic()]
                     } else {
                         vec![Span::raw(&blank_field.text).underlined().gray().italic()]
                     }
