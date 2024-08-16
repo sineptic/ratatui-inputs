@@ -58,17 +58,27 @@ impl BlocksWrapper {
 
         let result_kind = loop {
             let (head, current_block, tail) = split_at_mid(&mut self.items, self.cursor).unwrap();
-            let get_input_result = current_block
-                .get_input(self.start_from_left, &mut |current_placeholder_lines| {
-                    let head_lines = head.iter().flat_map(|x| x.as_lines());
-                    let tail_lines = tail.iter().flat_map(|x| x.as_lines());
-                    let text: Text = head_lines
-                        .chain(current_placeholder_lines)
-                        .chain(tail_lines)
-                        .collect();
-                    render(text)
-                })
-                .unwrap();
+            let get_input_result = {
+                let maybe_result = current_block.get_input(
+                    self.start_from_left,
+                    &mut |current_placeholder_lines| {
+                        let head_lines = head.iter().flat_map(|x| x.as_lines());
+                        let tail_lines = tail.iter().flat_map(|x| x.as_lines());
+                        let text: Text = head_lines
+                            .chain(current_placeholder_lines)
+                            .chain(tail_lines)
+                            .collect();
+                        render(text)
+                    },
+                );
+                if let Some(result) = maybe_result {
+                    result
+                } else if self.select_next_block()? {
+                    continue;
+                } else {
+                    return None;
+                }
+            };
             if let Ok(result_kind) = get_input_result {
                 match result_kind {
                     ResultKind::Ok => {
