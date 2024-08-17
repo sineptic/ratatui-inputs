@@ -1,13 +1,13 @@
 [package]
 name = "ratatui_inputs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
 crossterm = "0.28.1"
 ratatui = "0.28.0"
 readonly = "0.2.12"
-s_text_input_f = "0.1.1"
+s_text_input_f = "0.2"
 
 [features]
 fast_select_one = []

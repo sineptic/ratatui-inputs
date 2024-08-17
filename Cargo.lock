@@ -281,7 +281,7 @@ dependencies = [
 
 [[package]]
 name = "ratatui_inputs"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "crossterm",
  "ratatui",
@@ -336,9 +336,9 @@ checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
 
 [[package]]
 name = "s_text_input_f"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80d5e807624a5a49bc21dbc86b7867fd793ed029b35c277684f41c24d2428245"
+checksum = "559c1ca9c3277f01afd5f1e9d996a1b3e9027bafa709e33028f0574c7c638d6c"
 dependencies = [
  "serde",
 ]
