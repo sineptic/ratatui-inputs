@@ -336,7 +336,9 @@ checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
 
 [[package]]
 name = "s_text_input_f"
-version = "0.1.0"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "80d5e807624a5a49bc21dbc86b7867fd793ed029b35c277684f41c24d2428245"
 dependencies = [
  "serde",
 ]
