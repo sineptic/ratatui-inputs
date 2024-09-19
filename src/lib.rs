@@ -15,6 +15,29 @@ pub fn get_input(
     }
 }
 
+// TODO: Create custom handled for end of iteraction
+#[allow(clippy::missing_panics_doc)]
+pub fn display_answer(
+    input_blocks: s_text_input_f::Blocks,
+    user_answer: Vec<Vec<String>>,
+    correct_answer: Vec<Vec<String>>,
+    render: &mut impl FnMut(ratatui::text::Text) -> std::io::Result<()>,
+) -> std::io::Result<()> {
+    let answered = {
+        let mut temp = s_text_input_f::to_answered(input_blocks, user_answer, correct_answer)
+            .into_iter()
+            .map(Block::Answered)
+            .collect::<Vec<_>>();
+        temp.push(Block::Paragraph(vec![
+            s_text_input_f::ParagraphItem::Placeholder,
+        ]));
+        temp
+    };
+
+    get_input(answered, render)
+        .expect("last elem must be blank field by design. implementation issue")
+        .map(|_| ())
+}
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ResultKind {
