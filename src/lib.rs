@@ -69,7 +69,9 @@ pub fn get_text_input(
             render(styled, blank_field.text())
         })? {
             ResultKind::Ok => return Ok((ResultKind::Ok, blank_field.text().to_owned())),
-            ResultKind::Canceled => return Ok((ResultKind::Ok, blank_field.text().to_owned())),
+            ResultKind::Canceled => {
+                return Ok((ResultKind::Canceled, blank_field.text().to_owned()))
+            }
             ResultKind::NextBlock => (),
             ResultKind::PrevBlock => (),
         }
