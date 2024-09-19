@@ -23,7 +23,11 @@ impl From<Vec<String>> for OneOfWrapper {
 }
 impl OneOfWrapper {
     pub fn finalize(self) -> Vec<String> {
-        vec![self.selected.unwrap().to_string()]
+        if let Some(selected) = self.selected {
+            vec![selected.to_string()]
+        } else {
+            vec!["0".into()]
+        }
     }
     pub fn get_input(
         &mut self,

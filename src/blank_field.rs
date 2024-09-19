@@ -101,8 +101,8 @@ impl BlankField {
 }
 
 impl BlankField {
-    pub fn finalize(&self) -> String {
-        self.text.clone()
+    pub fn text(&self) -> &str {
+        &self.text
     }
     pub fn get_input(
         &mut self,

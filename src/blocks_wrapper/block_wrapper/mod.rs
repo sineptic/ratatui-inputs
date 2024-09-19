@@ -64,7 +64,7 @@ impl BlockWrapper {
 }
 
 mod one_of_wrapper;
-mod paragraph_wrapper;
+pub mod paragraph_wrapper;
 mod answered_block_wrapper {
     use answered_one_of_wrapper::AnsweredOneOfWrapper;
     use answered_paragraph_wrapper::AnsweredParagraphWrapper;

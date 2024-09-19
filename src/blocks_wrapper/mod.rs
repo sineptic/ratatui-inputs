@@ -121,4 +121,4 @@ impl BlocksWrapper {
     }
 }
 
-mod block_wrapper;
+pub mod block_wrapper;

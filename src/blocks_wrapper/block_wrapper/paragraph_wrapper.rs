@@ -182,7 +182,7 @@ pub mod paragraph_item_wrapper {
     }
     impl ParagraphItemWrapper {
         pub fn finalize(self) -> Result<String, Self> {
-            self.try_into_placeholder().map(|x| x.finalize())
+            self.try_into_placeholder().map(|x| x.text().to_owned())
         }
         pub fn get_input(
             &mut self,
@@ -241,11 +241,14 @@ pub mod paragraph_item_wrapper {
         blank_field: &BlankField,
         render: &mut impl FnMut(Vec<Span>) -> std::io::Result<()>,
     ) -> std::io::Result<()> {
+        render(style_active_blank_field(blank_field))
+    }
+    pub fn style_active_blank_field(blank_field: &BlankField) -> Vec<Span> {
         let (a, b) = blank_field.text.split_at(blank_field.cursor);
-        render(vec![
+        vec![
             Span::raw(a).underlined().italic(),
             Span::raw("|").blue(),
             Span::raw(b).underlined().italic(),
-        ])
+        ]
     }
 }
