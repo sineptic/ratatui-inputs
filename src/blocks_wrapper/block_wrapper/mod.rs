@@ -34,7 +34,7 @@ impl BlockWrapper {
             BlockWrapper::AnyOf => todo!(),
             BlockWrapper::OneOf(o) => o.finalize(),
             BlockWrapper::Paragraph(p) => p.finalize(),
-            BlockWrapper::Answered(a) => vec![],
+            BlockWrapper::Answered(_) => vec![],
         }
     }
     pub fn get_input(

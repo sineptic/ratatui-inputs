@@ -5,7 +5,7 @@ use crossterm::event::{KeyCode, KeyEventKind};
 #[readonly::make]
 #[derive(Debug)]
 pub struct BlankField {
-    pub text: String,
+    pub text: Vec<char>,
     pub cursor: usize,
 }
 
@@ -24,8 +24,11 @@ enum Event {
 }
 
 impl BlankField {
+    pub fn text(&self) -> String {
+        self.text.iter().collect()
+    }
     pub fn is_empty(&self) -> bool {
-        self.text.trim().is_empty()
+        self.text().trim().is_empty()
     }
     fn add_char(&mut self, c: char) {
         self.text.insert(self.cursor, c);
@@ -101,9 +104,6 @@ impl BlankField {
 }
 
 impl BlankField {
-    pub fn text(&self) -> &str {
-        &self.text
-    }
     pub fn get_input(
         &mut self,
         render: &mut impl FnMut(&Self) -> std::io::Result<()>,

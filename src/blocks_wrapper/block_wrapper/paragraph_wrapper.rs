@@ -207,7 +207,7 @@ pub mod paragraph_item_wrapper {
                     if blank_field.is_empty() {
                         vec![Span::raw("<empty>").dark_gray().italic()]
                     } else {
-                        vec![Span::raw(&blank_field.text).underlined().gray().italic()]
+                        vec![Span::raw(blank_field.text()).underlined().gray().italic()]
                     }
                 }
             }
@@ -244,11 +244,16 @@ pub mod paragraph_item_wrapper {
         render(style_active_blank_field(blank_field))
     }
     pub fn style_active_blank_field(blank_field: &BlankField) -> Vec<Span> {
-        let (a, b) = blank_field.text.split_at(blank_field.cursor);
+        let chars = &blank_field.text;
+        let (a, b) = chars.split_at(blank_field.cursor);
         vec![
-            Span::raw(a).underlined().italic(),
+            Span::raw(a.iter().collect::<String>())
+                .underlined()
+                .italic(),
             Span::raw("|").blue(),
-            Span::raw(b).underlined().italic(),
+            Span::raw(b.iter().collect::<String>())
+                .underlined()
+                .italic(),
         ]
     }
 }

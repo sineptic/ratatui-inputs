@@ -1,8 +1,10 @@
-#![warn(clippy::missing_panics_doc, clippy::doc_markdown)]
+#![warn(clippy::doc_markdown)]
 #![warn(clippy::too_many_lines)]
 
 use blocks_wrapper::block_wrapper::paragraph_wrapper::paragraph_item_wrapper::style_active_blank_field;
+use ratatui::text::Text;
 use s_text_input_f::Block;
+use std::fmt::Write;
 
 pub fn get_input(
     input_request: s_text_input_f::Blocks,
@@ -16,7 +18,6 @@ pub fn get_input(
 }
 
 // TODO: Create custom handled for end of iteraction
-#[allow(clippy::missing_panics_doc)]
 pub fn display_answer(
     input_blocks: s_text_input_f::Blocks,
     user_answer: Vec<Vec<String>>,
@@ -66,7 +67,7 @@ pub fn get_text_input(
             let styled = ratatui::text::Text::from(ratatui::text::Line::from(
                 style_active_blank_field(blank_field),
             ));
-            render(styled, blank_field.text())
+            render(styled, &blank_field.text())
         })? {
             ResultKind::Ok => return Ok((ResultKind::Ok, blank_field.text().to_owned())),
             ResultKind::Canceled => {
@@ -75,5 +76,36 @@ pub fn get_text_input(
             ResultKind::NextBlock => (),
             ResultKind::PrevBlock => (),
         }
+    }
+}
+
+pub fn get_paragraph(
+    render: &mut impl FnMut(Text, String) -> std::io::Result<()>,
+) -> std::io::Result<Option<s_text_input_f_parser::CorrectParagraph>> {
+    let (result_kind, inputs) = get_text_input(&mut |styled, text| {
+        let support_text = s_text_input_f_parser::parse_paragraph(text)
+            .map(|parsed| {
+                let mut buffer = String::new();
+                let _ = writeln!(buffer, "{parsed:#?}");
+                buffer
+            })
+            .map_err(|err| {
+                let mut buffer = String::new();
+                for err in err {
+                    let _ = writeln!(buffer, "Error: {err}.");
+                }
+                buffer
+            });
+        let support_text = match support_text {
+            Ok(x) => x,
+            Err(x) => x,
+        };
+        render(styled, support_text)
+    })
+    .unwrap();
+    match result_kind {
+        ResultKind::Ok => Ok(s_text_input_f_parser::parse_paragraph(&inputs).ok()),
+        ResultKind::Canceled => Ok(None),
+        _ => unreachable!(),
     }
 }
