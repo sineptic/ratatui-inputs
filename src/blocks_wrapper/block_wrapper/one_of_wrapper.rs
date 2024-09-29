@@ -122,7 +122,7 @@ enum Event {
     NextItem,
     PrevItem,
     NextBlock,
-    NextBlockAllowFinish,
+    EnterKey,
     PrevBlock,
     Redraw,
     Cancel,
@@ -137,7 +137,7 @@ impl OneOfWrapper {
                         if k.kind == KeyEventKind::Press {
                             match k.code {
                                 KeyCode::Char(' ') => Some(Event::Select),
-                                KeyCode::Enter => Some(Event::NextBlockAllowFinish),
+                                KeyCode::Enter => Some(Event::EnterKey),
                                 KeyCode::Down | KeyCode::Char('j' | 'J') => Some(Event::NextItem),
                                 KeyCode::Up | KeyCode::Char('k' | 'K') => Some(Event::PrevItem),
                                 KeyCode::Tab => {
@@ -203,12 +203,17 @@ impl OneOfWrapper {
                     }
                 }
             }
-            Event::NextBlockAllowFinish => {
+            Event::EnterKey => {
                 if self.selected.is_some() {
                     Some(ResultKind::Ok)
                 } else {
-                    self.select_next_placeholder().unwrap();
-                    None
+                    if cfg!(feature = "fast_select_with_enter") {
+                        self.selected = Some(self.cursor);
+                        Some(ResultKind::Ok)
+                    } else {
+                        self.select_next_placeholder().unwrap();
+                        None
+                    }
                 }
             }
             Event::PrevBlock => {
