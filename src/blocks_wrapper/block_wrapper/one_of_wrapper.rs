@@ -154,7 +154,7 @@ impl OneOfWrapper {
                                         Some(Event::PrevItem)
                                     }
                                 }
-                                KeyCode::Esc => Some(Event::Cancel),
+                                KeyCode::Esc | KeyCode::Char('q' | 'Q') => Some(Event::Cancel),
                                 _ => None,
                             }
                         } else {
