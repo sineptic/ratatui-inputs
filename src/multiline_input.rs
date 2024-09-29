@@ -136,11 +136,11 @@ impl MultilineInput {
         let (a, b) = chars.split_at(self.cursor);
         let a = a
             .split(|ch| *ch == '\n')
-            .map(|line| line.into_iter().collect::<String>())
+            .map(|line| line.iter().collect::<String>())
             .collect::<Vec<_>>();
         let b = b
             .split(|ch| *ch == '\n')
-            .map(|line| line.into_iter().collect::<String>())
+            .map(|line| line.iter().collect::<String>())
             .collect::<Vec<_>>();
 
         let mut lines = vec![];
@@ -148,24 +148,18 @@ impl MultilineInput {
         if let Some((mid_left, start)) = a.split_last() {
             lines.append(
                 &mut start
-                    .to_owned()
-                    .into_iter()
-                    .map(|x| Line::raw(x).underlined().italic())
+                    .iter()
+                    .cloned()
+                    .map(|x| Line::raw(x).italic())
                     .collect(),
             );
-            current_line.push(Span::raw(mid_left.to_owned()).underlined().italic());
+            current_line.push(Span::raw(mid_left.to_owned()).italic());
         }
         current_line.push(Span::raw("|").blue());
         if let Some((mid_right, end)) = b.split_first() {
-            current_line.push(Span::raw(mid_right.to_owned()).underlined().italic());
+            current_line.push(Span::raw(mid_right.to_owned()).italic());
             lines.push(Line::from(current_line));
-            lines.append(
-                &mut end
-                    .to_owned()
-                    .into_iter()
-                    .map(|x| Line::raw(x).underlined().italic())
-                    .collect(),
-            )
+            lines.append(&mut end.iter().cloned().map(|x| Line::raw(x).italic()).collect())
         } else {
             lines.push(Line::from(current_line));
         }
