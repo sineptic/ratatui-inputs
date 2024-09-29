@@ -1,7 +1,6 @@
 #![warn(clippy::doc_markdown)]
 #![warn(clippy::too_many_lines)]
 
-use blocks_wrapper::block_wrapper::paragraph_wrapper::paragraph_item_wrapper::style_active_blank_field;
 use ratatui::text::Text;
 use s_text_input_f::Block;
 use std::fmt::Write;
@@ -49,6 +48,7 @@ pub enum ResultKind {
 }
 
 mod blank_field;
+mod multiline_input;
 
 fn split_at_mid<T>(slice: &mut [T], mid: usize) -> Option<(&mut [T], &mut T, &mut [T])> {
     let (head, tail) = slice.split_at_mut(mid);
@@ -61,17 +61,12 @@ mod blocks_wrapper;
 pub fn get_text_input(
     render: &mut impl FnMut(ratatui::text::Text, &str) -> std::io::Result<()>,
 ) -> std::io::Result<(ResultKind, String)> {
-    let mut blank_field = blank_field::BlankField::default();
+    let mut multyline_input = multiline_input::MultilineInput::default();
     loop {
-        match blank_field.get_input(&mut |blank_field| {
-            let styled = ratatui::text::Text::from(ratatui::text::Line::from(
-                style_active_blank_field(blank_field),
-            ));
-            render(styled, &blank_field.text())
-        })? {
-            ResultKind::Ok => return Ok((ResultKind::Ok, blank_field.text().to_owned())),
+        match multyline_input.get_input(&mut |x| render(x.style(), &x.text()))? {
+            ResultKind::Ok => return Ok((ResultKind::Ok, multyline_input.text().to_owned())),
             ResultKind::Canceled => {
-                return Ok((ResultKind::Canceled, blank_field.text().to_owned()))
+                return Ok((ResultKind::Canceled, multyline_input.text().to_owned()))
             }
             ResultKind::NextBlock => (),
             ResultKind::PrevBlock => (),
