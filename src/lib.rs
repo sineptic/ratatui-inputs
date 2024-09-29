@@ -78,7 +78,7 @@ pub fn get_block(
     render: &mut impl FnMut(Text, String) -> std::io::Result<()>,
 ) -> std::io::Result<Option<s_text_input_f_parser::CorrectBlock>> {
     let (result_kind, inputs) = get_text_input(&mut |styled, text| {
-        let support_text = s_text_input_f_parser::parse_block(text)
+        let support_text = s_text_input_f_parser::parse_block(text.trim())
             .map(|parsed| {
                 let mut buffer = String::new();
                 let _ = writeln!(buffer, "{parsed:#?}");
@@ -108,7 +108,7 @@ pub fn get_blocks(
     render: &mut impl FnMut(Text, String) -> std::io::Result<()>,
 ) -> std::io::Result<Option<s_text_input_f_parser::CorrectBlocks>> {
     let (result_kind, inputs) = get_text_input(&mut |styled, text| {
-        let support_text = s_text_input_f_parser::parse_blocks(text)
+        let support_text = s_text_input_f_parser::parse_blocks(text.trim())
             .map(|parsed| {
                 let mut buffer = String::new();
                 let _ = writeln!(buffer, "{parsed:#?}");

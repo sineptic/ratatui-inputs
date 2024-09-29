@@ -31,9 +31,6 @@ impl MultilineInput {
     pub fn text(&self) -> String {
         self.text.iter().collect()
     }
-    pub fn is_empty(&self) -> bool {
-        self.text().trim().is_empty()
-    }
     fn add_char(&mut self, c: char) {
         self.text.insert(self.cursor, c);
         self.move_cursor_right();
@@ -68,9 +65,9 @@ impl MultilineInput {
                                 KeyCode::Backspace => Some(Event::RemoveCurrentChar),
                                 KeyCode::Enter => {
                                     if k.modifiers.contains(crossterm::event::KeyModifiers::ALT) {
-                                        Some(Event::AddChar('\n'))
-                                    } else {
                                         Some(Event::Finish)
+                                    } else {
+                                        Some(Event::AddChar('\n'))
                                     }
                                 }
                                 KeyCode::Left => Some(Event::MoveCursorLeft),
