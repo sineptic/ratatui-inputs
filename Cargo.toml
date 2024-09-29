@@ -12,3 +12,4 @@ s_text_input_f-parser = "0.1"
 
 [features]
 fast_select_one = []
+fast_select_with_enter = []

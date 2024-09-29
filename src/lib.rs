@@ -79,11 +79,11 @@ pub fn get_text_input(
     }
 }
 
-pub fn get_paragraph(
+pub fn get_block(
     render: &mut impl FnMut(Text, String) -> std::io::Result<()>,
-) -> std::io::Result<Option<s_text_input_f_parser::CorrectParagraph>> {
+) -> std::io::Result<Option<s_text_input_f_parser::CorrectBlock>> {
     let (result_kind, inputs) = get_text_input(&mut |styled, text| {
-        let support_text = s_text_input_f_parser::parse_paragraph(text)
+        let support_text = s_text_input_f_parser::parse_block(text)
             .map(|parsed| {
                 let mut buffer = String::new();
                 let _ = writeln!(buffer, "{parsed:#?}");
@@ -104,7 +104,37 @@ pub fn get_paragraph(
     })
     .unwrap();
     match result_kind {
-        ResultKind::Ok => Ok(s_text_input_f_parser::parse_paragraph(&inputs).ok()),
+        ResultKind::Ok => Ok(s_text_input_f_parser::parse_block(&inputs).ok()),
+        ResultKind::Canceled => Ok(None),
+        _ => unreachable!(),
+    }
+}
+pub fn get_blocks(
+    render: &mut impl FnMut(Text, String) -> std::io::Result<()>,
+) -> std::io::Result<Option<s_text_input_f_parser::CorrectBlocks>> {
+    let (result_kind, inputs) = get_text_input(&mut |styled, text| {
+        let support_text = s_text_input_f_parser::parse_blocks(text)
+            .map(|parsed| {
+                let mut buffer = String::new();
+                let _ = writeln!(buffer, "{parsed:#?}");
+                buffer
+            })
+            .map_err(|err| {
+                let mut buffer = String::new();
+                for err in err {
+                    let _ = writeln!(buffer, "Error: {err}.");
+                }
+                buffer
+            });
+        let support_text = match support_text {
+            Ok(x) => x,
+            Err(x) => x,
+        };
+        render(styled, support_text)
+    })
+    .unwrap();
+    match result_kind {
+        ResultKind::Ok => Ok(s_text_input_f_parser::parse_blocks(&inputs).ok()),
         ResultKind::Canceled => Ok(None),
         _ => unreachable!(),
     }
