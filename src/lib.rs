@@ -1,5 +1,6 @@
 #![warn(clippy::doc_markdown)]
 #![warn(clippy::too_many_lines)]
+#![allow(dead_code)] // FIXME: remove this
 
 use ratatui::text::Text;
 use s_text_input_f::Block;
@@ -24,10 +25,7 @@ pub fn display_answer(
     render: &mut impl FnMut(ratatui::text::Text) -> std::io::Result<()>,
 ) -> std::io::Result<()> {
     let answered = {
-        let mut temp = s_text_input_f::to_answered(input_blocks, user_answer, correct_answer)
-            .into_iter()
-            .map(Block::Answered)
-            .collect::<Vec<_>>();
+        let mut temp = s_text_input_f::to_answered(input_blocks, user_answer, correct_answer);
         temp.push(Block::Paragraph(vec![
             s_text_input_f::ParagraphItem::Placeholder,
         ]));

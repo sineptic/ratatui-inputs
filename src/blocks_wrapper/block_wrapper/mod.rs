@@ -12,8 +12,8 @@ pub enum BlockWrapper {
 impl From<s_text_input_f::Block> for BlockWrapper {
     fn from(value: s_text_input_f::Block) -> Self {
         match value {
-            s_text_input_f::Block::Order(_) => todo!(),
-            s_text_input_f::Block::AnyOf(_) => todo!(),
+            s_text_input_f::Block::Order(_) => todo!("`order` input not implemented"),
+            s_text_input_f::Block::AnyOf(_) => todo!("`any_of` input not implemented"),
             s_text_input_f::Block::OneOf(items) => {
                 Self::OneOf(one_of_wrapper::OneOfWrapper::from(items))
             }
