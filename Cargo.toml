@@ -1,5 +1,7 @@
 [package]
 name = "ratatui_inputs"
+description = "ratatui library to process sineptic text input format"
+license = "MIT"
 version = "0.1.3"
 edition = "2021"
 
