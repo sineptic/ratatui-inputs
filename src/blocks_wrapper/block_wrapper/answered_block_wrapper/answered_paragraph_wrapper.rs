@@ -19,7 +19,7 @@ impl AnsweredParagraphWrapper {
 #[derive(Debug)]
 enum AnsweredParagraphItem {
     Text(String),
-    Anser {
+    Answer {
         user_answer: String,
         correct_answer: String,
     },
@@ -31,7 +31,7 @@ impl From<s_text_input_f::ParagraphItemAnswered> for AnsweredParagraphItem {
             s_text_input_f::ParagraphItemAnswered::Answer {
                 user_answer,
                 correct_answer,
-            } => AnsweredParagraphItem::Anser {
+            } => AnsweredParagraphItem::Answer {
                 user_answer,
                 correct_answer,
             },
@@ -44,7 +44,7 @@ impl AnsweredParagraphItem {
             AnsweredParagraphItem::Text(s) => {
                 vec![Span::raw(s)]
             }
-            AnsweredParagraphItem::Anser {
+            AnsweredParagraphItem::Answer {
                 user_answer,
                 correct_answer,
             } => {

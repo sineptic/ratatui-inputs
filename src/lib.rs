@@ -10,14 +10,14 @@ pub fn get_input(
     input_request: s_text_input_f::Blocks,
     render: &mut impl FnMut(ratatui::text::Text) -> std::io::Result<()>,
 ) -> Option<std::io::Result<(ResultKind, s_text_input_f::Response)>> {
-    let mut blocks_wraper = blocks_wrapper::BlocksWrapper::from(input_request);
-    match blocks_wraper.get_input(render)? {
-        Ok(result_kind) => Some(Ok((result_kind, blocks_wraper.finalize()))),
+    let mut blocks_wrapper = blocks_wrapper::BlocksWrapper::from(input_request);
+    match blocks_wrapper.get_input(render)? {
+        Ok(result_kind) => Some(Ok((result_kind, blocks_wrapper.finalize()))),
         Err(err) => Some(Err(err)),
     }
 }
 
-// TODO: Create custom handled for end of iteraction
+// TODO: Create custom handled for end of interaction
 pub fn display_answer(
     input_blocks: s_text_input_f::Blocks,
     user_answer: Vec<Vec<String>>,
