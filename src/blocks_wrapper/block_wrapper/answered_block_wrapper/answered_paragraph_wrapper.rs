@@ -63,7 +63,7 @@ impl AnsweredParagraphItem {
                 } else {
                     vec![
                         Span::raw(user_answer).red().crossed_out(),
-                        Span::raw(correct_answer).green(),
+                        Span::raw(correct_answer).yellow(),
                     ]
                 }
             }

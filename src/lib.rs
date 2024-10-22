@@ -33,7 +33,7 @@ pub fn display_answer(
     };
 
     get_input(answered, render)
-        .expect("last elem must be blank field by design. implementation issue")
+        .expect("Last elem must be blank field by design. It's a bug")
         .map(|_| ())
 }
 
