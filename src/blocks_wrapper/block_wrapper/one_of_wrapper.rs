@@ -203,6 +203,7 @@ impl OneOfWrapper {
                     }
                 }
             }
+            #[allow(clippy::collapsible_else_if)]
             Event::EnterKey => {
                 if self.selected.is_some() {
                     Some(ResultKind::Ok)

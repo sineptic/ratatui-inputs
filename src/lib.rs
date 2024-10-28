@@ -25,7 +25,10 @@ pub fn display_answer(
     render: &mut impl FnMut(ratatui::text::Text) -> std::io::Result<()>,
 ) -> std::io::Result<()> {
     let answered = {
-        let mut temp = s_text_input_f::to_answered(input_blocks, user_answer, correct_answer);
+        let mut temp = s_text_input_f::to_answered(input_blocks, user_answer, correct_answer)
+            .into_iter()
+            .map(s_text_input_f::Block::Answered)
+            .collect::<Vec<_>>();
         temp.push(Block::Paragraph(vec![
             s_text_input_f::ParagraphItem::Placeholder,
         ]));
@@ -57,11 +60,11 @@ fn split_at_mid<T>(slice: &mut [T], mid: usize) -> Option<(&mut [T], &mut T, &mu
 mod blocks_wrapper;
 
 pub fn get_text_input(
-    render: &mut impl FnMut(ratatui::text::Text, &str) -> std::io::Result<()>,
+    render: &mut impl FnMut(ratatui::text::Text, String) -> std::io::Result<()>,
 ) -> std::io::Result<(ResultKind, String)> {
     let mut multyline_input = multiline_input::MultilineInput::default();
     loop {
-        match multyline_input.get_input(&mut |x| render(x.style(), &x.text()))? {
+        match multyline_input.get_input(&mut |x| render(x.style(), x.text()))? {
             ResultKind::Ok => return Ok((ResultKind::Ok, multyline_input.text().to_owned())),
             ResultKind::Canceled => {
                 return Ok((ResultKind::Canceled, multyline_input.text().to_owned()))
@@ -104,7 +107,7 @@ pub fn get_block(
 }
 pub fn get_blocks(
     render: &mut impl FnMut(Text, String) -> std::io::Result<()>,
-) -> std::io::Result<Option<s_text_input_f_parser::CorrectBlocks>> {
+) -> std::io::Result<Option<s_text_input_f::BlocksWithAnswer>> {
     let (result_kind, inputs) = get_text_input(&mut |styled, text| {
         let support_text = s_text_input_f_parser::parse_blocks(text.trim())
             .map(|parsed| {
