@@ -2,7 +2,7 @@
 name = "ratatui_inputs"
 description = "ratatui library to process sineptic text input format"
 license = "MIT"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 
 [dependencies]

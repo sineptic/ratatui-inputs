@@ -238,7 +238,7 @@ fn as_line(s: &str) -> Line {
     Line::from(vec![Span::raw(" -  ").blue(), Span::raw(s)]).italic()
 }
 fn current_line_styles() -> Style {
-    Style::new().on_black()
+    Style::new().bold().fg(ratatui::style::Color::Magenta)
 }
 fn selected_line_styles() -> Style {
     Style::new().bold().not_italic()
