@@ -118,12 +118,13 @@ impl ParagraphWrapper {
     /// - `Some(false)` if it's first placeholder already
     /// - `None`        if there is no placeholders
     fn select_prev_placeholder(&mut self) -> Option<bool> {
-        let starting = self.cursor;
-        self.cursor -= 1;
-        if self.cursor == self.items.len() {
-            self.cursor = starting;
+        if self.cursor == 0 {
             return Some(false);
         }
+
+        let starting = self.cursor;
+        self.cursor -= 1;
+
         while (1..self.items.len()).contains(&self.cursor) && !self.get_current()?.is_placeholder()
         {
             self.cursor -= 1;
