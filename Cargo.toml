@@ -2,7 +2,7 @@
 name = "ratatui_inputs"
 description = "ratatui library to process sineptic text input format"
 license = "MIT"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 
 [dependencies]
@@ -13,5 +13,5 @@ s_text_input_f = "0.3"
 s_text_input_f-parser = "0.2"
 
 [features]
-fast_select_one = []
+fast_tab_scroll = []
 fast_select_with_enter = []

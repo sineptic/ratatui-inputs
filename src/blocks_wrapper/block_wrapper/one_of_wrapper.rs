@@ -141,14 +141,14 @@ impl OneOfWrapper {
                                 KeyCode::Down | KeyCode::Char('j' | 'J') => Some(Event::NextItem),
                                 KeyCode::Up | KeyCode::Char('k' | 'K') => Some(Event::PrevItem),
                                 KeyCode::Tab => {
-                                    if cfg!(feature = "fast_select_one") {
+                                    if cfg!(feature = "fast_tab_scroll") {
                                         Some(Event::NextBlock)
                                     } else {
                                         Some(Event::NextItem)
                                     }
                                 }
                                 KeyCode::BackTab => {
-                                    if cfg!(feature = "fast_select_one") {
+                                    if cfg!(feature = "fast_tab_scroll") {
                                         Some(Event::PrevBlock)
                                     } else {
                                         Some(Event::PrevItem)
